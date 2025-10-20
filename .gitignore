@@ -1,0 +1,46 @@
+# ---- Unity (core) ----
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Mm]emoryCaptures/
+[Rr]ecordings/
+UserSettings/
+
+# ---- Unity cache / packages ----
+Library/
+Packages/PackageCache/
+
+# ---- OS / IDE ----
+.DS_Store
+Thumbs.db
+.vs/
+.vscode/
+.idea/
+
+# ---- Rider / JetBrains ----
+*.sln.iml
+
+# ---- Android / iOS build outputs ----
+.gradle/
+ExportedObj/
+*.apk
+*.aab
+*.ipa
+Pods/
+
+# ---- Unity Addressables / Generated ----
+Assets/AddressableAssetsData/*/Android/
+Assets/AddressableAssetsData/*/iOS/
+# （ビルド生成物だけ ignore。設定ファイルは必要なら除外パターン調整）
+
+# ---- Crash / profiler ----
+*.pidb
+*.mdb
+*.opendb
+*.VC.db
+
+# ---- Other binaries you don't want ----
+*.unitypackage

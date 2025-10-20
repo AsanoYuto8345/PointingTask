@@ -1,0 +1,83 @@
+using System;
+using UnityEngine;
+using TMPro;
+using System.IO;
+
+public class Ditector : MonoBehaviour
+{
+    public GameObject menuCanvas;
+    public GameObject countCanvas;
+    public GameObject target;
+
+    float startTime, diff_time;
+    Vector3 prePosition;
+
+    // Start is called before the first frame update
+    void Start()
+    { 
+
+    }
+    // Update is called once per frame
+
+    void Update()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            Vector2 clickPoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            Collider2D collision2D = Physics2D.OverlapPoint(clickPoint);
+
+            if (collision2D)
+            {
+                Debug.Log(collision2D.gameObject.name);
+
+                // クリックされたGameObject clickedObjectを取得
+                GameObject clickedObject = collision2D.transform.gameObject;
+
+                // ランダム移動
+                Vector3 nowPosition = clickedObject.transform.position;
+                clickedObject.transform.position = new Vector2(UnityEngine.Random.Range(-7.0f, 7.0f), UnityEngine.Random.Range(-4.0f, 4.0f));
+                clickedObject.transform.localScale = new Vector2(1, 1);
+
+                // 距離、時間計算
+                float Distance = Vector3.Distance(prePosition, nowPosition);
+                prePosition = nowPosition;
+                diff_time = Time.time - startTime;
+                startTime = Time.time;
+
+                // ファイルに書きこみ
+                writePointingData("移動距離: " + Distance + " 時間: " + diff_time);
+            }
+            else
+            {
+                // その下にオブジェクトがない
+                Debug.Log("クリックできてないよ");
+            }
+        }
+    }
+
+    // ファイル書き込み
+    void writePointingData(string txt)
+    {
+        using (StreamWriter stream_writer = new StreamWriter("./PointingLog.txt", true))
+        {
+            stream_writer.WriteLine(txt);
+            stream_writer.Close();
+        }
+    }
+
+    // 実験モード遷移
+    public void changeExperimentMode()
+    {
+        menuCanvas.SetActive(false);
+        target.SetActive(true);
+        startTime = Time.time;
+        writePointingData("計測開始: " + DateTime.Now.ToString());
+    }
+
+    // メニューモード遷移
+    public void changeMenuMode()
+    {
+        target.SetActive(false);
+        menuCanvas.SetActive(true);
+    }
+}

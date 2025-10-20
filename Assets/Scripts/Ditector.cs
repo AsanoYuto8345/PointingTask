@@ -2,11 +2,13 @@ using System;
 using UnityEngine;
 using TMPro;
 using System.IO;
+using System.Collections;
 
 public class Ditector : MonoBehaviour
 {
     public GameObject menuCanvas;
     public GameObject countCanvas;
+    public TextMeshProUGUI countText;
     public GameObject target;
 
     float startTime, diff_time;
@@ -69,9 +71,7 @@ public class Ditector : MonoBehaviour
     public void changeExperimentMode()
     {
         menuCanvas.SetActive(false);
-        target.SetActive(true);
-        startTime = Time.time;
-        writePointingData("計測開始: " + DateTime.Now.ToString());
+        StartCoroutine(countDown());
     }
 
     // メニューモード遷移
@@ -79,5 +79,22 @@ public class Ditector : MonoBehaviour
     {
         target.SetActive(false);
         menuCanvas.SetActive(true);
+    }
+
+    IEnumerator countDown()
+    {
+        // カウントダウン表示
+        countCanvas.SetActive(true);
+        for (int i = 3; i >= 1; i--)
+        {
+            countText.text = i.ToString();
+            yield return new WaitForSeconds(1f);
+        }
+        countCanvas.SetActive(false);
+        
+        // ターゲット表示
+        target.SetActive(true);
+        startTime = Time.time;
+        writePointingData("計測開始: " + DateTime.Now.ToString());
     }
 }

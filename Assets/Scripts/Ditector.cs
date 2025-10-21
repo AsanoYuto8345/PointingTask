@@ -13,7 +13,7 @@ public class Ditector : MonoBehaviour
     Vector3 prePosition;
     int count;
     float startTime, diff_time;
-    bool isBigMode, isExperimentMode;
+    bool isExperimentMode;
 
 
     // Start is called before the first frame update
@@ -41,12 +41,9 @@ public class Ditector : MonoBehaviour
                 Vector3 nowPosition = clickedObject.transform.position;
                 clickedObject.transform.position = new Vector2(UnityEngine.Random.Range(-7.0f, 7.0f), UnityEngine.Random.Range(-4.0f, 4.0f));
 
-                // 大きさ設定
-                settingTargetScale();
-
                 // カウント処理 25回クリックでモード反転
-                count++;
-                if (count == 25) isBigMode = !isBigMode;
+                count--;
+                countText.text = count.ToString();
 
                 // 距離、時間計算
                 float Distance = Vector3.Distance(prePosition, nowPosition);
@@ -79,13 +76,6 @@ public class Ditector : MonoBehaviour
     public void changeExperimentMode()
     {
         menuCanvas.SetActive(false);
-
-        //モード抽選
-        int lottery = UnityEngine.Random.Range(1, 100);
-        if (lottery % 2 == 0) { isBigMode = false; }
-        else { isBigMode = true; }
-        settingTargetScale();
-
         StartCoroutine(startExperiment());
     }
 
@@ -109,21 +99,9 @@ public class Ditector : MonoBehaviour
 
         // ターゲット表示
         target.SetActive(true);
-        count = 0;
+        count = 50;
         startTime = Time.time;
         isExperimentMode = true;
         writePointingData("計測開始: " + DateTime.Now.ToString());
-    }
-
-    void settingTargetScale()
-    {
-        if (isBigMode)
-        {
-            target.transform.localScale = new Vector2(2, 2);
-        }
-        else
-        {
-            target.transform.localScale = new Vector2(1, 1);
-        }
     }
 }

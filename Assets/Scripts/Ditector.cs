@@ -8,11 +8,15 @@ public class Ditector : MonoBehaviour
 {
     public GameObject menuCanvas;
     public GameObject countCanvas;
+    public GameObject experimentCanvas;
+    public GameObject resultCanvas;
     public TextMeshProUGUI countText;
+    public TextMeshProUGUI countDownText;
+    public TextMeshProUGUI resultText;
     public GameObject target;
     Vector3 prePosition;
     int count;
-    float startTime, diff_time;
+    float initTime, startTime, diff_time;
     bool isExperimentMode;
 
 
@@ -25,41 +29,54 @@ public class Ditector : MonoBehaviour
 
     void Update()
     {
-        if (isExperimentMode && Input.GetMouseButtonDown(0))
+        if (isExperimentMode)
         {
-            Vector2 clickPoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            Collider2D collision2D = Physics2D.OverlapPoint(clickPoint);
-
-            if (collision2D)
+            if (Input.GetMouseButtonDown(0))
             {
-                Debug.Log(collision2D.gameObject.name);
+                Vector2 clickPoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                Collider2D collision2D = Physics2D.OverlapPoint(clickPoint);
 
-                // クリックされたGameObject clickedObjectを取得
-                GameObject clickedObject = collision2D.transform.gameObject;
+                if (collision2D)
+                {
+                    Debug.Log(collision2D.gameObject.name);
 
-                // ランダム移動
-                Vector3 nowPosition = clickedObject.transform.position;
-                clickedObject.transform.position = new Vector2(UnityEngine.Random.Range(-7.0f, 7.0f), UnityEngine.Random.Range(-4.0f, 4.0f));
+                    // クリックされたGameObject clickedObjectを取得
+                    GameObject clickedObject = collision2D.transform.gameObject;
 
-                // カウント処理 25回クリックでモード反転
-                count--;
-                countText.text = count.ToString();
+                    // ランダム移動
+                    Vector3 nowPosition = clickedObject.transform.position;
+                    clickedObject.transform.position = new Vector2(UnityEngine.Random.Range(-7.0f, 7.0f), UnityEngine.Random.Range(-4.0f, 4.0f));
 
-                // 距離、時間計算
-                float Distance = Vector3.Distance(prePosition, nowPosition);
-                prePosition = nowPosition;
-                diff_time = Time.time - startTime;
-                startTime = Time.time;
+                    // カウント処理
+                    count--;
+                    countText.text = "残: " + count.ToString();
 
-                // ログファイルに書きこみ
-                writePointingData("移動距離: " + Distance + " 時間: " + diff_time);
+                    // 距離、時間計算
+                    float Distance = Vector3.Distance(prePosition, nowPosition);
+                    prePosition = nowPosition;
+                    diff_time = Time.time - startTime;
+                    startTime = Time.time;
+
+                    // ログファイルに書きこみ
+                    writePointingData("移動距離: " + Distance + " 時間: " + diff_time);
+                }
+                else
+                {
+                    // その下にオブジェクトがない
+                    Debug.Log("クリックできてないよ");
+                }
             }
-            else
+
+            if (isExperimentMode && count == 0)
             {
-                // その下にオブジェクトがない
-                Debug.Log("クリックできてないよ");
+                changeResultMode();
             }
         }
+
+        // if (Input.GetKeyDown(KeyCode.A))
+        // {
+        //     count = 1;
+        // }
     }
 
     // ファイル書き込み
@@ -79,10 +96,23 @@ public class Ditector : MonoBehaviour
         StartCoroutine(startExperiment());
     }
 
+    public void changeResultMode()
+    {
+        isExperimentMode = false;
+        experimentCanvas.SetActive(false);
+        target.SetActive(false);
+
+        string resultTime = (Time.time - initTime).ToString();
+        resultText.text = "計測時間: " + resultTime;
+        writePointingData("計測時間: " + resultTime + "\n実験終了");
+
+        resultCanvas.SetActive(true);
+    }
+
     // メニューモード遷移
     public void changeMenuMode()
     {
-        target.SetActive(false);
+        resultCanvas.SetActive(false);
         menuCanvas.SetActive(true);
     }
 
@@ -92,16 +122,19 @@ public class Ditector : MonoBehaviour
         countCanvas.SetActive(true);
         for (int i = 3; i >= 1; i--)
         {
-            countText.text = i.ToString();
+            countDownText.text = i.ToString();
             yield return new WaitForSeconds(1f);
         }
         countCanvas.SetActive(false);
 
         // ターゲット表示
+        initTime = Time.time;
         target.SetActive(true);
-        count = 50;
+        count = 100;
+        countText.text = "残: " + count.ToString();
         startTime = Time.time;
         isExperimentMode = true;
+        experimentCanvas.SetActive(true);
         writePointingData("計測開始: " + DateTime.Now.ToString());
     }
 }

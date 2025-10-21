@@ -16,6 +16,7 @@ public class Ditector : MonoBehaviour
     public GameObject target;
     Vector3 prePosition;
     int count;
+    int accidentalClick;
     float initTime, startTime, diff_time;
     bool isExperimentMode;
 
@@ -58,12 +59,15 @@ public class Ditector : MonoBehaviour
                     startTime = Time.time;
 
                     // ログファイルに書きこみ
-                    writePointingData("移動距離: " + Distance + " 時間: " + diff_time);
+                    writePointingData("移動距離: " + Distance + ", 時間: " + diff_time + ", 誤クリック: " + accidentalClick);
+
+                    // 誤クリックカウントリセット
+                    accidentalClick = 0;
                 }
                 else
                 {
-                    // その下にオブジェクトがない
-                    Debug.Log("クリックできてないよ");
+                    // 誤クリック
+                    accidentalClick++;
                 }
             }
 
@@ -131,6 +135,7 @@ public class Ditector : MonoBehaviour
         initTime = Time.time;
         target.SetActive(true);
         count = 100;
+        accidentalClick = 0;
         countText.text = "残: " + count.ToString();
         startTime = Time.time;
         isExperimentMode = true;

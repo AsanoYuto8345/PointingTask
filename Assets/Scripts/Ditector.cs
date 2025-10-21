@@ -18,7 +18,7 @@ public class Ditector : MonoBehaviour
     int count;
     int accidentalClick;
     float initTime, startTime, diff_time;
-    bool isExperimentMode;
+    bool isExperimentMode, isPracticeMode;
 
 
     // Start is called before the first frame update
@@ -86,18 +86,29 @@ public class Ditector : MonoBehaviour
     // ファイル書き込み
     void writePointingData(string txt)
     {
-        using (StreamWriter stream_writer = new StreamWriter("./PointingLog.txt", true))
+        if (!isPracticeMode)
         {
-            stream_writer.WriteLine(txt);
-            stream_writer.Close();
+            using (StreamWriter stream_writer = new StreamWriter("./PointingLog.txt", true))
+            {
+                stream_writer.WriteLine(txt);
+                stream_writer.Close();
+            }
         }
     }
 
     // 実験モード遷移
     public void changeExperimentMode()
     {
+        isPracticeMode = false;
         menuCanvas.SetActive(false);
-        StartCoroutine(startExperiment());
+        StartCoroutine(startExperiment(100));
+    }
+
+    public void changePracticeMode()
+    {
+        isPracticeMode = true;
+        menuCanvas.SetActive(false);
+        StartCoroutine(startExperiment(10));
     }
 
     public void changeResultMode()
@@ -120,7 +131,7 @@ public class Ditector : MonoBehaviour
         menuCanvas.SetActive(true);
     }
 
-    IEnumerator startExperiment()
+    IEnumerator startExperiment(int click)
     {
         // カウントダウン表示
         countCanvas.SetActive(true);
@@ -134,7 +145,7 @@ public class Ditector : MonoBehaviour
         // ターゲット表示
         initTime = Time.time;
         target.SetActive(true);
-        count = 100;
+        count = click;
         accidentalClick = 0;
         countText.text = "残: " + count.ToString();
         startTime = Time.time;

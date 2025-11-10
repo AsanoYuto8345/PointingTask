@@ -12,10 +12,11 @@ public class Ditector : MonoBehaviour
     public GameObject experimentCanvas;
     public GameObject resultCanvas;
     public GameObject pointer;
+    public GameObject target;
+    public GameObject virtualCursor;
     public TextMeshProUGUI countText;
     public TextMeshProUGUI countDownText;
     public TextMeshProUGUI resultText;
-    public GameObject target;
     public Toggle toggle;
     Vector3 prePosition;
     int count;
@@ -118,6 +119,8 @@ public class Ditector : MonoBehaviour
 
     public void changeResultMode()
     {
+        Cursor.visible = true;
+        virtualCursor.SetActive(false);
         destroyPointer();
         isExperimentMode = false;
         experimentCanvas.SetActive(false);
@@ -172,7 +175,9 @@ public class Ditector : MonoBehaviour
 
     IEnumerator startExperiment(int click)
     {
-        generatePointer();
+        Cursor.visible = false;
+        virtualCursor.SetActive(true);
+        if(isTenKeyMode)generatePointer();
         // カウントダウン表示
         countCanvas.SetActive(true);
         for (int i = 3; i >= 1; i--)

@@ -1335,6 +1335,7 @@ MonoBehaviour:
   countCanvas: {fileID: 2118993559}
   experimentCanvas: {fileID: 1330498785}
   resultCanvas: {fileID: 1189312674}
+  pointer: {fileID: 2049369500882210123, guid: a04523f95eca0a64da63f2d02b8b299a, type: 3}
   countText: {fileID: 1877082866}
   countDownText: {fileID: 2137386705}
   resultText: {fileID: 1504316951}

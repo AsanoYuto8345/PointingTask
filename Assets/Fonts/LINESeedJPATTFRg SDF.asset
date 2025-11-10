@@ -166,7 +166,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 71c1514a6bd24e1e882cebbe1904ce04, type: 3}
-  m_Name: LINESeedJP_A_TTF_Rg SDF
+  m_Name: LINESeedJPATTFRg SDF
   m_EditorClassIdentifier: 
   hashCode: 806415167
   material: {fileID: -7590603962336464515}

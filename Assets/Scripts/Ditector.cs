@@ -11,6 +11,7 @@ public class Ditector : MonoBehaviour
     public GameObject countCanvas;
     public GameObject experimentCanvas;
     public GameObject resultCanvas;
+    public GameObject pointer;
     public TextMeshProUGUI countText;
     public TextMeshProUGUI countDownText;
     public TextMeshProUGUI resultText;
@@ -117,6 +118,7 @@ public class Ditector : MonoBehaviour
 
     public void changeResultMode()
     {
+        destroyPointer();
         isExperimentMode = false;
         experimentCanvas.SetActive(false);
         target.SetActive(false);
@@ -135,8 +137,42 @@ public class Ditector : MonoBehaviour
         menuCanvas.SetActive(true);
     }
 
+    public void generatePointer()
+    {
+        Camera cam = Camera.main;
+
+        for (int i = 0; i < 3; i++)
+        {
+            for (int j = 0; j < 3; j++)
+            {
+                // 画面座標上での分割点（中央寄せ）
+                float screenX = (i + 0.5f) * Screen.width / 3f;
+                float screenY = (j + 0.5f) * Screen.height / 3f;
+
+                // スクリーン座標 → ワールド座標に変換
+                Vector3 worldPos = cam.ScreenToWorldPoint(new Vector3(screenX, screenY, cam.nearClipPlane + 10f));
+
+                // ポインター生成
+                GameObject p = Instantiate(pointer, worldPos, Quaternion.identity);
+                Pointer pointerComponent = p.GetComponent<Pointer>();
+                pointerComponent.key = i + j * 3 + 1;
+                p.tag = "Pointer";
+            }
+        }
+    }
+
+    public void destroyPointer()
+    {
+        GameObject[] pointers = GameObject.FindGameObjectsWithTag("Pointer");
+        foreach (GameObject p in pointers)
+        {
+            Destroy(p);
+        }
+    }
+
     IEnumerator startExperiment(int click)
     {
+        generatePointer();
         // カウントダウン表示
         countCanvas.SetActive(true);
         for (int i = 3; i >= 1; i--)

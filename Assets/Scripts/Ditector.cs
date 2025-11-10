@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 using System.IO;
 using System.Collections;
@@ -14,11 +15,12 @@ public class Ditector : MonoBehaviour
     public TextMeshProUGUI countDownText;
     public TextMeshProUGUI resultText;
     public GameObject target;
+    public Toggle toggle;
     Vector3 prePosition;
     int count;
     int accidentalClick;
     float initTime, startTime, diff_time;
-    bool isExperimentMode, isPracticeMode;
+    bool isExperimentMode, isPracticeMode, isTenKeyMode;
 
 
     // Start is called before the first frame update
@@ -99,6 +101,7 @@ public class Ditector : MonoBehaviour
     // 実験モード遷移
     public void changeExperimentMode()
     {
+        isTenKeyMode = toggle.isOn;
         isPracticeMode = false;
         menuCanvas.SetActive(false);
         StartCoroutine(startExperiment(100));
@@ -106,6 +109,7 @@ public class Ditector : MonoBehaviour
 
     public void changePracticeMode()
     {
+        isTenKeyMode = toggle.isOn;
         isPracticeMode = true;
         menuCanvas.SetActive(false);
         StartCoroutine(startExperiment(10));

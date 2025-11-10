@@ -10,13 +10,15 @@ public class Pointer : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Keypad1 + (key - 1)))
         {
+            Debug.Log("Key pressed for Pointer: " + key);
             MoveCursorToPointer();
         }
     }
 
     void MoveCursorToPointer()
     {
+        Debug.Log("MoveCursorToPointer: " + key);
         GameObject cursor = GameObject.FindGameObjectWithTag("Cursor");
-        cursor.transform.position = transform.position;
+        cursor.transform.position = new Vector3(transform.position.x, transform.position.y, 0.3f);
     }
 }

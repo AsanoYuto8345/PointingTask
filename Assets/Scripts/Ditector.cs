@@ -29,6 +29,7 @@ public class Ditector : MonoBehaviour
     void Start()
     {
         isExperimentMode = false;
+        Cursor.lockState = CursorLockMode.Confined;
     }
     // Update is called once per frame
 
@@ -38,39 +39,78 @@ public class Ditector : MonoBehaviour
         {
             if (Input.GetMouseButtonDown(0))
             {
-                Vector2 clickPoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                Collider2D collision2D = Physics2D.OverlapPoint(clickPoint);
+                // virtualCursor の Collider2D があればその bounds を使って重なりを調べる。
+                // なければ virtualCursor.transform.position を基準に OverlapPoint を使う。
+                Collider2D collision2D = null;
 
-                if (collision2D)
+                if (virtualCursor != null)
                 {
-                    Debug.Log(collision2D.gameObject.name);
-
-                    // クリックされたGameObject clickedObjectを取得
-                    GameObject clickedObject = collision2D.transform.gameObject;
-
-                    // ランダム移動
-                    Vector3 nowPosition = clickedObject.transform.position;
-                    clickedObject.transform.position = new Vector2(UnityEngine.Random.Range(-7.0f, 7.0f), UnityEngine.Random.Range(-4.0f, 4.0f));
-
-                    // カウント処理
-                    count--;
-                    countText.text = "残: " + count.ToString();
-
-                    // 距離、時間計算
-                    float Distance = Vector3.Distance(prePosition, nowPosition);
-                    prePosition = nowPosition;
-                    diff_time = Time.time - startTime;
-                    startTime = Time.time;
-
-                    // ログファイルに書きこみ
-                    writePointingData("移動距離: " + Distance + ", 時間: " + diff_time + ", 誤クリック: " + accidentalClick);
-
-                    // 誤クリックカウントリセット
-                    accidentalClick = 0;
+                    Collider2D vCol = virtualCursor.GetComponent<Collider2D>();
+                    if (vCol != null)
+                    {
+                        // Collider の bounds を使って OverlapBoxAll で重なりを検出
+                        Bounds b = vCol.bounds;
+                        Collider2D[] overlaps = Physics2D.OverlapBoxAll(b.center, b.size, 0f);
+                        if (overlaps != null && overlaps.Length > 0)
+                        {
+                            // 最初に見つかったものをクリック対象とする（必要ならソートしてz順/優先度を変える）
+                            collision2D = overlaps[0];
+                        }
+                    }
+                    else
+                    {
+                        // Collider が無ければ transform.position を基準に判定
+                        collision2D = Physics2D.OverlapPoint(virtualCursor.transform.position);
+                    }
                 }
                 else
                 {
-                    // 誤クリック
+                    // virtualCursor が割り当てられていない場合は従来のマウス位置ベースの判定にフォールバック
+                    if (Camera.main != null)
+                    {
+                        Vector2 clickPoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                        collision2D = Physics2D.OverlapPoint(clickPoint);
+                    }
+                }
+
+                if (collision2D)
+                {
+                    GameObject clickedObject = collision2D.transform.gameObject;
+
+                    // クリック対象が target の場合に target をランダム移動させる
+                    if (clickedObject == target)
+                    {
+                        Debug.Log("Target clicked: " + clickedObject.name);
+
+                        // 現在の target の位置を取得してからランダム移動
+                        Vector3 nowPosition = target.transform.position;
+                        target.transform.position = new Vector2(UnityEngine.Random.Range(-7.0f, 7.0f), UnityEngine.Random.Range(-4.0f, 4.0f));
+
+                        // カウント処理
+                        count--;
+                        countText.text = "残: " + count.ToString();
+
+                        // 距離、時間計算（prePosition は target の前回位置を保持している想定）
+                        float Distance = Vector3.Distance(prePosition, nowPosition);
+                        prePosition = nowPosition;
+                        diff_time = Time.time - startTime;
+                        startTime = Time.time;
+
+                        // ログファイルに書きこみ
+                        writePointingData("移動距離: " + Distance + ", 時間: " + diff_time + ", 誤クリック: " + accidentalClick);
+
+                        // 誤クリックカウントリセット
+                        accidentalClick = 0;
+                    }
+                    else
+                    {
+                        // virtualCursor が何か他のオブジェクトに当たっている場合は誤クリック扱い
+                        accidentalClick++;
+                    }
+                }
+                else
+                {
+                    // 衝突なしは誤クリック
                     accidentalClick++;
                 }
             }

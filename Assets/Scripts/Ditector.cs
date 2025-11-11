@@ -17,13 +17,14 @@ public class Ditector : MonoBehaviour
     public TextMeshProUGUI countText;
     public TextMeshProUGUI countDownText;
     public TextMeshProUGUI resultText;
-    public Toggle toggle;
+    public Toggle pointerModeToggle;
+    public Toggle distanceModeToggle;
     public Camera cam;
     Vector3 prePosition;
     int count;
     int accidentalClick;
     float initTime, startTime, diff_time;
-    bool isExperimentMode, isPracticeMode, isTenKeyMode;
+    bool isExperimentMode, isPracticeMode, isPointerMode, isLongDistanceMode;
 
 
     // Start is called before the first frame update
@@ -90,7 +91,10 @@ public class Ditector : MonoBehaviour
 
                         // 現在の target の位置を取得してからランダム移動
                         Vector3 nowPosition = target.transform.position;
-                        target.transform.position = calcNextTargetPosition(7.0f);
+                        if(isLongDistanceMode)
+                            target.transform.position = calcNextTargetPosition(10.0f);
+                        else
+                            target.transform.position = calcNextTargetPosition(3.0f);
 
                         // カウント処理
                         count--;
@@ -166,16 +170,18 @@ public class Ditector : MonoBehaviour
     // 実験モード遷移
     public void changeExperimentMode()
     {
-        isTenKeyMode = toggle.isOn;
+        isPointerMode = pointerModeToggle.isOn;
+        isLongDistanceMode = distanceModeToggle.isOn;
         isPracticeMode = false;
         menuCanvas.SetActive(false);
-        StartCoroutine(startExperiment(100));
+        StartCoroutine(startExperiment(50));
     }
 
     // 練習モード遷移
     public void changePracticeMode()
     {
-        isTenKeyMode = toggle.isOn;
+        isPointerMode = pointerModeToggle.isOn;
+        isLongDistanceMode = distanceModeToggle.isOn;
         isPracticeMode = true;
         menuCanvas.SetActive(false);
         StartCoroutine(startExperiment(10));
@@ -248,7 +254,7 @@ public class Ditector : MonoBehaviour
     {
         Cursor.visible = false;
         virtualCursor.SetActive(true);
-        if(isTenKeyMode)generatePointer();
+        if(isPointerMode)generatePointer();
         // カウントダウン表示
         countCanvas.SetActive(true);
         for (int i = 3; i >= 1; i--)

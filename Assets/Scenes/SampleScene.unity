@@ -1342,6 +1342,7 @@ MonoBehaviour:
   countDownText: {fileID: 2137386705}
   resultText: {fileID: 1504316951}
   toggle: {fileID: 2111771019}
+  cam: {fileID: 519420031}
 --- !u!1 &1189312674
 GameObject:
   m_ObjectHideFlags: 0

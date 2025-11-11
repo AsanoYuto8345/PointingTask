@@ -18,6 +18,7 @@ public class Ditector : MonoBehaviour
     public TextMeshProUGUI countDownText;
     public TextMeshProUGUI resultText;
     public Toggle toggle;
+    public Camera cam;
     Vector3 prePosition;
     int count;
     int accidentalClick;
@@ -30,6 +31,11 @@ public class Ditector : MonoBehaviour
     {
         isExperimentMode = false;
         Cursor.lockState = CursorLockMode.Confined;
+
+        // カメラが割り当てられていなければ main を使う
+        if (cam == null) cam = Camera.main;
+        // target を画面内のランダムな位置に設定
+        target.transform.position = GetRandomScreenPosition(0.05f);
     }
     // Update is called once per frame
 
@@ -84,7 +90,7 @@ public class Ditector : MonoBehaviour
 
                         // 現在の target の位置を取得してからランダム移動
                         Vector3 nowPosition = target.transform.position;
-                        target.transform.position = new Vector2(UnityEngine.Random.Range(-7.0f, 7.0f), UnityEngine.Random.Range(-4.0f, 4.0f));
+                        target.transform.position = calcNextTargetPosition(7.0f);
 
                         // カウント処理
                         count--;
@@ -127,8 +133,25 @@ public class Ditector : MonoBehaviour
         // }
     }
 
+    // ターゲット遷移
+    private Vector3 calcNextTargetPosition(float distance)
+    {
+        while (true)
+        {
+            // 距離distance上の円周上のランダムな点を計算
+            float angle = UnityEngine.Random.Range(0f, 2f * Mathf.PI);
+            Vector3 newPos = target.transform.position + new Vector3(distance * Mathf.Cos(angle), distance * Mathf.Sin(angle), 0);
+            Vector3 np = cam.WorldToViewportPoint(newPos);
+            if (np.x >= 0f && np.x <= 1f && np.y >= 0f && np.y <= 1f)
+            {
+                return newPos;
+            }
+        }
+    }
+
+
     // ファイル書き込み
-    void writePointingData(string txt)
+    private void writePointingData(string txt)
     {
         if (!isPracticeMode)
         {
@@ -149,6 +172,7 @@ public class Ditector : MonoBehaviour
         StartCoroutine(startExperiment(100));
     }
 
+    // 練習モード遷移
     public void changePracticeMode()
     {
         isTenKeyMode = toggle.isOn;
@@ -156,6 +180,7 @@ public class Ditector : MonoBehaviour
         menuCanvas.SetActive(false);
         StartCoroutine(startExperiment(10));
     }
+    // 結果モード遷移
 
     public void changeResultMode()
     {
@@ -180,6 +205,7 @@ public class Ditector : MonoBehaviour
         menuCanvas.SetActive(true);
     }
 
+    // ポインター生成
     public void generatePointer()
     {
         Camera cam = Camera.main;
@@ -204,6 +230,7 @@ public class Ditector : MonoBehaviour
         }
     }
 
+    // ポインター破棄
     public void destroyPointer()
     {
         GameObject[] pointers = GameObject.FindGameObjectsWithTag("Pointer");
@@ -213,6 +240,7 @@ public class Ditector : MonoBehaviour
         }
     }
 
+    // 実験開始処理
     IEnumerator startExperiment(int click)
     {
         Cursor.visible = false;
@@ -237,5 +265,29 @@ public class Ditector : MonoBehaviour
         isExperimentMode = true;
         experimentCanvas.SetActive(true);
         writePointingData("計測開始: " + DateTime.Now.ToString());
+    }
+
+    // 画面内のランダムなワールド座標を返す（margin はビューポート端からの余白）
+    private Vector3 GetRandomScreenPosition(float margin = 0.05f)
+    {
+        Camera c = (cam != null) ? cam : Camera.main;
+        if (c == null || target == null)
+        {
+            return Vector3.zero;
+        }
+
+        // ビューポート内のランダムな位置を選択
+        float x = UnityEngine.Random.Range(margin, 1f - margin);
+        float y = UnityEngine.Random.Range(margin, 1f - margin);
+
+        // カメラからターゲットの深度（距離）を計算して ViewportToWorldPoint に渡す
+        float depth = Mathf.Abs(c.transform.position.z - target.transform.position.z);
+        // depth がゼロや非常に小さい場合は十分な距離を設定
+        if (depth < 0.001f) depth = 10f;
+
+        Vector3 worldPos = c.ViewportToWorldPoint(new Vector3(x, y, depth));
+        // 2D の Z をターゲットと同じに揃える
+        worldPos.z = target.transform.position.z;
+        return worldPos;
     }
 }

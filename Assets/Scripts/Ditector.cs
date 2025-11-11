@@ -17,8 +17,8 @@ public class Ditector : MonoBehaviour
     public TextMeshProUGUI countText;
     public TextMeshProUGUI countDownText;
     public TextMeshProUGUI resultText;
-    public Toggle pointerModeToggle;
-    public Toggle distanceModeToggle;
+    public ToggleTextButton pointerModeButton;
+    public ToggleTextButton distanceModeButton;
     public Camera cam;
     Vector3 prePosition;
     int count;
@@ -170,8 +170,16 @@ public class Ditector : MonoBehaviour
     // 実験モード遷移
     public void changeExperimentMode()
     {
-        isPointerMode = pointerModeToggle.isOn;
-        isLongDistanceMode = distanceModeToggle.isOn;
+
+        if(pointerModeButton.GetState() == 1)
+            isPointerMode = true;
+        else
+            isPointerMode = false;
+        if(distanceModeButton.GetState() == 1)
+            isLongDistanceMode = true;
+        else
+            isLongDistanceMode = false;
+
         isPracticeMode = false;
         menuCanvas.SetActive(false);
         StartCoroutine(startExperiment(50));
@@ -180,11 +188,18 @@ public class Ditector : MonoBehaviour
     // 練習モード遷移
     public void changePracticeMode()
     {
-        isPointerMode = pointerModeToggle.isOn;
-        isLongDistanceMode = distanceModeToggle.isOn;
+        if(pointerModeButton.GetState() == 1)
+            isPointerMode = true;
+        else
+            isPointerMode = false;
+        if(distanceModeButton.GetState() == 1)
+            isLongDistanceMode = true;
+        else
+            isLongDistanceMode = false;
+        
         isPracticeMode = true;
         menuCanvas.SetActive(false);
-        StartCoroutine(startExperiment(10));
+        StartCoroutine(startExperiment(25));
     }
     // 結果モード遷移
 

@@ -67,7 +67,8 @@
     <Compile Include="Assets\Scripts\Pointer.cs" />
     <Compile Include="Assets\Scripts\VirtualCursor.cs" />
     <Compile Include="Assets\Scripts\Ditector.cs" />
-    <Compile Include="Assets\Scripts\ToggleSwitch.cs" />
+    <Compile Include="Assets\Scripts\ToggleTextButton.cs" />
+    <Compile Include="Assets\Scripts\RandomText.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />

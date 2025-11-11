@@ -224,7 +224,10 @@ public class Ditector : MonoBehaviour
                 // ポインター生成
                 GameObject p = Instantiate(pointer, worldPos, Quaternion.identity);
                 Pointer pointerComponent = p.GetComponent<Pointer>();
-                pointerComponent.key = i + j * 3 + 1;
+                // キー割り当てを Q W E / A S D / Z X C の配列（左上->右下）に対応させる。
+                // ここでは top-row が 1..3, middle-row が 4..6, bottom-row が 7..9 になるように割り当てる。
+                // 画面上では j==2 が top（ループは j=0..2 で bottom->top になるので変換する）
+                pointerComponent.key = i + (2 - j) * 3 + 1;
                 p.tag = "Pointer";
             }
         }

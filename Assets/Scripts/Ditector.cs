@@ -167,6 +167,10 @@ public class Ditector : MonoBehaviour
         }
     }
 
+    public void pressedResetButton(){
+        writePointingData("人切り替え: " + DateTime.Now.ToString());
+    }
+
     // 実験モード遷移
     public void changeExperimentMode()
     {
@@ -182,6 +186,8 @@ public class Ditector : MonoBehaviour
 
         isPracticeMode = false;
         menuCanvas.SetActive(false);
+        // 実験開始時にモード情報をログに出力する
+        writePointingData("モード: ポインターモード=" + (isPointerMode ? "ON" : "OFF") + ", 遠距離モード=" + (isLongDistanceMode ? "ON" : "OFF"));
         StartCoroutine(startExperiment(50));
     }
 
